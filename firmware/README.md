@@ -1,6 +1,8 @@
 #Firmware for the NodeMCU
 ##Current Tasks:
 1. Break into smaller functions
+2. Store credential in EEPROM
+3. Load credential when boot up (unplug, power loss)
 
 ##Achieved Tasks:
 1. Connect to WiFi with hard-coded ssid, password
