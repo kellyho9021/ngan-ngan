@@ -5,6 +5,7 @@ const char* password = "123456789";
  
 const char* host = "54.183.182.211";
 const int httpPort = 8080;
+const char* deviceKey = "GiCungDuoc";
 
 const int ledPin = 13;
 
@@ -37,7 +38,7 @@ void setup() {
 }
 
 
-String url = "/hackuci/Binh";
+String url = "/Ngan-Ngan/Binh";
 int value = 0;
 
 void sendStatus(bool t)
@@ -50,11 +51,11 @@ void sendStatus(bool t)
   } 
   if (t)
   {
-    client.print(String("GET ") + url + "?status=on" + " HTTP/1.1\r\n" +
+    client.print(String("GET ") + url + "?status=on&dkey=" + deviceKey + " HTTP/1.1\r\n" +
                "Host: " + host + "\r\n" + 
                "Connection: close\r\n\r\n");
   } else {
-    client.print(String("GET ") + url + "?status=off" + " HTTP/1.1\r\n" +
+    client.print(String("GET ") + url + "?status=off&dkey=" + deviceKey + " HTTP/1.1\r\n" +
                "Host: " + host + "\r\n" + 
                "Connection: close\r\n\r\n");
   }
@@ -81,7 +82,7 @@ void loop() {
   
   // This will send the request to the server
   
-  client.print(String("GET ") + url + " HTTP/1.1\r\n" +
+  client.print(String("GET ") + url + "?dkey=" + deviceKey + " HTTP/1.1\r\n" +
                "Host: " + host + "\r\n" + 
                "Connection: close\r\n\r\n");
   delay(500);
