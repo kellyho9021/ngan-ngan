@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
 
 import android.os.Handler;
 import android.os.AsyncTask;
@@ -20,8 +18,6 @@ public class MainActivity extends AppCompatActivity {
 
     Handler handler = new Handler();
     TextView myListView;
-    int count = 1;
-    boolean changeAction = false;
     String action;
     String status;
     @Override
@@ -38,18 +34,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void changeAction(View view){
+        String dkey = "GiCungDuoc";
         //DO NOTHING
         if(action.equals("off"))
             action = "on";
         else if(action.equals("on"))
             action = "off";
-        new MyTask().execute("http://54.183.182.211:8080/hackuci/Binh?action=" + action);
+        new MyTask().execute("http://54.183.182.211:8080/Ngan-Ngan/Binh?dkey=GiCungDuoc&action=" + action);
     }
 
     private Runnable runnableCode = new Runnable() {
         @Override
         public void run() {
-            new MyTask().execute("http://54.183.182.211:8080/hackuci/Binh");
+            new MyTask().execute("http://54.183.182.211:8080/Ngan%2DNgan/");
             handler.postDelayed(runnableCode, 2000);
         }
     };
@@ -84,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
                 s = e.toString();
             }
-            count++;
             return null;
         }
 

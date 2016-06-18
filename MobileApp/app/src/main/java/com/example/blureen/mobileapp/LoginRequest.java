@@ -10,7 +10,7 @@ import java.util.Map;
  * Created by BluReen on 6/17/2016.
  */
 public class LoginRequest extends StringRequest{
-    private static final String LOGIN_URL = "view-source:http://54.183.182.211:8080/Ngan-Ngan/Login.html";
+    private static final String LOGIN_URL = "http://54.183.182.211:8080/Tao-Lao/AndroidLogin";
     private Map<String, String> params;
 
     public LoginRequest(String username, String password, Response.Listener<String> listener){
