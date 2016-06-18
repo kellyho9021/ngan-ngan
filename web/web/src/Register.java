@@ -6,23 +6,18 @@
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+import java.sql.*;
 /**
  *
- * @author Khoi
+ * @author Administrator
  */
-@WebServlet(urlPatterns = {"/Binh"})
-public class Binh extends HttpServlet {
+@WebServlet(urlPatterns = {"/Register"})
+public class Register extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -38,69 +33,50 @@ public class Binh extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         
-        /* Create Connection Objects */
+        //Get user input
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        String email = request.getParameter("email");
+        String fname = request.getParameter("fname");
+        String lname = request.getParameter("lname");
+        
+        //Validation - need to be done later
+        
+        //Create connection objects
         Connection con = null;
-        Statement stm = null;
+        PreparedStatement ps = null;
         ResultSet rs = null;
         
       
         String myDriver = "com.mysql.jdbc.Driver";
         String myUrl = "jdbc:mysql:///ngan_ngan";
+        
         try{
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
+            Class.forName(myDriver).newInstance();
             con = DriverManager.getConnection(myUrl,Credential.user, Credential.pass);
-            stm = con.createStatement();
+            //update db
+            String query = "INSERT INTO Users(fname,lname,email,username,password) VALUES(?,?,?,?,?)";
+            ps = con.prepareStatement(query);
+            ps.setString(1, fname);
+            ps.setString(2, lname);
+            ps.setString(3, email);
+            ps.setString(4, username);
+            ps.setString(5, password);
+            ps.executeUpdate();     
             
-            String deviceAction = request.getParameter("action");
-            String deviceStatus = request.getParameter("status");
-            String strTemp = null;
-            String dkey = request.getParameter("dkey");
+            out.println("New account for <b>" + username +"</b> has been created <br>");
+            out.println("Click <a href='index.jsp'>here</a> to return to index");
             
-            
-            //update action
-            if (deviceAction != null)
-            {
-                String actionQuery = "UPDATE Devices SET daction = '" + deviceAction + "' WHERE dkey = '" + dkey + "'";
-                stm.executeUpdate(actionQuery);
-            }
-            
-            //update status
-            if (deviceStatus != null)
-            {
-                String statusQuery = "UPDATE Devices SET dstatus = '" + deviceStatus + "' WHERE dkey = '" + dkey + "'";
-                stm.executeUpdate(statusQuery);
-            }
-            
-            //update temp
-            if (strTemp != null)
-            {
-                int temp = Integer.parseInt(strTemp);
-                String query = "INSERT INTO Temp VALUES(" + temp + ")";
-                stm.executeUpdate(query);
-            }
-            
-            //print out the current action/status
-            String deviceQuery = "SELECT daction, dstatus FROM Devices WHERE dkey = '" + dkey + "'";
-            rs = stm.executeQuery(deviceQuery);
-            
-            if (!rs.isBeforeFirst())
-                out.println("Cannot find the device");
-            else
-            {
-                rs.next();
-                out.println(rs.getString("daction") + " " + rs.getString("dstatus"));
-            }
-            
-                                   
+            //close connection
             con.close();
-            stm.close();
+            ps.close();
             rs.close();
         }
-        catch(Exception e){}
+        catch(Exception ignore){ out.println(ignore.getMessage());}
         finally{
             if (con != null) try {con.close();} catch (SQLException ignore){}
             if (rs != null) try {rs.close();} catch (SQLException ignore){}
-            if (stm != null) try {stm.close();} catch (SQLException ignore){}
+            if (ps != null) try {ps.close();} catch (SQLException ignore){}
         }
     }
 

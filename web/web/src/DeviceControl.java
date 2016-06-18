@@ -16,13 +16,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
- * @author Khoi
+ * @author Hoa
  */
-@WebServlet(urlPatterns = {"/Binh"})
-public class Binh extends HttpServlet {
+@WebServlet(urlPatterns = {"/DeviceControl"})
+public class DeviceControl extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -38,70 +39,92 @@ public class Binh extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         
+        //Check whether user's still logged
+        HttpSession session = request.getSession();
+        String username = (String) session.getAttribute("username");
+        if (username == null)
+        {
+            out.println("You have been logged out, click <a href='login.html'>here</a> to login again");
+            return;
+        }
+        
         /* Create Connection Objects */
         Connection con = null;
         Statement stm = null;
         ResultSet rs = null;
         
-      
-        String myDriver = "com.mysql.jdbc.Driver";
+        
         String myUrl = "jdbc:mysql:///ngan_ngan";
+        //Display devices list
         try{
             Class.forName("com.mysql.jdbc.Driver").newInstance();
             con = DriverManager.getConnection(myUrl,Credential.user, Credential.pass);
             stm = con.createStatement();
-            
-            String deviceAction = request.getParameter("action");
-            String deviceStatus = request.getParameter("status");
-            String strTemp = null;
-            String dkey = request.getParameter("dkey");
-            
-            
-            //update action
-            if (deviceAction != null)
-            {
-                String actionQuery = "UPDATE Devices SET daction = '" + deviceAction + "' WHERE dkey = '" + dkey + "'";
-                stm.executeUpdate(actionQuery);
-            }
-            
-            //update status
-            if (deviceStatus != null)
-            {
-                String statusQuery = "UPDATE Devices SET dstatus = '" + deviceStatus + "' WHERE dkey = '" + dkey + "'";
-                stm.executeUpdate(statusQuery);
-            }
-            
-            //update temp
-            if (strTemp != null)
-            {
-                int temp = Integer.parseInt(strTemp);
-                String query = "INSERT INTO Temp VALUES(" + temp + ")";
-                stm.executeUpdate(query);
-            }
-            
-            //print out the current action/status
-            String deviceQuery = "SELECT daction, dstatus FROM Devices WHERE dkey = '" + dkey + "'";
-            rs = stm.executeQuery(deviceQuery);
-            
+
+            //Get User ID
+            String usersQuery = "SELECT uid FROM Users WHERE username = '" + username + "'";
+            rs = stm.executeQuery(usersQuery);           
             if (!rs.isBeforeFirst())
-                out.println("Cannot find the device");
+            {
+                out.println("No record");
+            }
             else
             {
                 rs.next();
-                out.println(rs.getString("daction") + " " + rs.getString("dstatus"));
+                int uid = rs.getInt("uid");
+                
+                //Get list of devices
+                String query = "SELECT D.did, D.dname, D.dstatus, D.dkey as did, dname, dstatus, dkey FROM Devices D, User_Contain_Devices UCD" 
+                        + " WHERE D.did = UCD.did AND UCD.uid = " + uid;
+                rs = stm.executeQuery(query);
+                
+                out.println("<table");
+                out.println("<tr>");
+                out.println("<th width='100'>Device ID</th>");
+                out.println("<th width='100'>Device Name</th>");
+                out.println("<th width='100'>Device Status</th>");
+                out.println("<th width='100'></th>");
+                while(rs.next())
+                {
+                    out.println("<tr>");
+                    String dname = rs.getString("dname");
+                    String did = rs.getString("did");
+                    String dstatus = rs.getString("dstatus");
+                    String dkey = rs.getString("dkey");
+                    out.println("<td align='center'>"+ did + "</td>");
+                    out.println("<td align='center'><a href='deviceInfo.jsp?dkey=" + dkey + "'>" + dname + "</a></td>");
+                    out.println("<td align='center'>" + dstatus + "</td>");
+                    out.println("<td><input type='button' value='Remove'/></td>");
+                    out.println("</tr>");
+                }
+                out.println("</table>");
             }
             
-                                   
+                
+            
+            //Confirmation message
+            
+            //Redirect to DeviceControl serlvet
+            //request.getRequestDispatcher("addNewDevice.html").forward(request, response);
+            
+            //close connection
             con.close();
             stm.close();
             rs.close();
         }
-        catch(Exception e){}
+        catch(Exception ignore){out.println(ignore.getMessage());}
         finally{
             if (con != null) try {con.close();} catch (SQLException ignore){}
             if (rs != null) try {rs.close();} catch (SQLException ignore){}
             if (stm != null) try {stm.close();} catch (SQLException ignore){}
         }
+        
+        
+        
+        
+        
+        //Add new device
+        request.getRequestDispatcher("addNewDevice.html").include(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
