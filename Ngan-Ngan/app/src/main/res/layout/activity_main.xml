@@ -18,14 +18,15 @@
         android:layout_alignParentBottom="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="refresh"
-        android:text="Refresh" />
+        android:onClick="currentStatus"
+        android:text="Current Status" />
 
     <Button
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="stopConnection"
-        android:text="Stop Connection" />
+        android:onClick="changeAction"
+        android:text="Change Action" />
+
 </RelativeLayout>

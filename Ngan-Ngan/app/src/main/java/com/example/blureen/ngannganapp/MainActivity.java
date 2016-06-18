@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 
 import android.os.Handler;
 import android.os.AsyncTask;
@@ -19,22 +21,29 @@ public class MainActivity extends AppCompatActivity {
     Handler handler = new Handler();
     TextView myListView;
     int count = 1;
+    boolean changeAction = false;
+    String action;
+    String status;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         myListView = (TextView)findViewById(R.id.netResult);
+    }
+
+
+    public void currentStatus(View view)
+    {
         handler.post(runnableCode);
     }
 
-    public void stopConnection(View view)
-    {
-        handler.removeCallbacks(runnableCode);
-    }
-
-    public void refresh(View view)
-    {
-        handler.post(runnableCode);
+    public void changeAction(View view){
+        //DO NOTHING
+        if(action.equals("off"))
+            action = "on";
+        else if(action.equals("on"))
+            action = "off";
+        new MyTask().execute("http://54.183.182.211:8080/hackuci/Binh?action=" + action);
     }
 
     private Runnable runnableCode = new Runnable() {
@@ -63,10 +72,10 @@ public class MainActivity extends AppCompatActivity {
                     mess += buff;
                 }
                 String[] words = mess.split(" ");
-                String action = words[0];
-                String status = words[1];
+                action = words[0];
+                status = words[1];
                 reader.close();
-                s = count + " - Action : " + action + ", Status: " + status;
+                s = "Action : " + action + ", Status: " + status;
             } catch (MalformedURLException e) {
                 e.printStackTrace();
                 s = e.toString();
