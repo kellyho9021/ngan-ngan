@@ -8,3 +8,4 @@
 ### DB
 1. Create tables to keep track the users and devices
 2. Enable connection pooling on the Tomcat server
+3. Change current timezone from UTC to PDT, allow servlet to keep track of the sampling data along with its time.
